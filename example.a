@@ -1,0 +1,61 @@
+i32 x = -0x7fffffff;
+
+u32 fugg = "this is a string";
+
+r32 y = 1e2r32;
+r32 z = y;
+r32 w = -1e2r32;
+
+/*
+r32 test0();
+r32 test1();
+r32 test2();
+r32 test3();
+r32 test4();
+*/
+
+r32 test0(r32 arg0)
+{
+	{
+		{
+			{
+				{
+					i32 zzz;
+				}
+			}
+		}
+	}
+}
+
+r32 test1(r32 arg1)
+{
+	{
+		{
+			{
+				{
+					i32 xxx;
+					i32 yyy;
+				}
+			}
+		}
+	}
+}
+
+/*
+r32 test2()
+{
+	r32 t = 42.0r32;
+	r32 tt;
+	r32 ttt;
+}
+
+r32 test3()
+{
+	
+}
+
+r32 test4()
+{
+	
+}
+*/
