@@ -14,48 +14,36 @@ r32 test3();
 r32 test4();
 */
 
-r32 test0(r32 arg0)
+r32 test0()
 {
 	{
 		{
 			{
 				{
-					i32 zzz;
+					
 				}
 			}
 		}
 	}
+	r64 v = 42r32;
+	r64 vv = 42r32;
+	r64 vvv = 42r32;
 }
 
-r32 test1(r32 arg1)
+r32 test1(r32 foo)
 {
 	{
-		{
-			{
-				{
-					i32 xxx;
-					i32 yyy;
-				}
-			}
-		}
+		r64 v = 42r32;
+		r64 vv = 43r32;
 	}
+	r32 vvv = 44r32;
 }
 
-/*
-r32 test2()
+r32 test2(r32 foo, r32 bar)
 {
-	r32 t = 42.0r32;
-	r32 tt;
-	r32 ttt;
+	{
+		r64 v = 42r32;
+		r64 vv = 43r32;
+	}
+	r32 vvv = 44r32;
 }
-
-r32 test3()
-{
-	
-}
-
-r32 test4()
-{
-	
-}
-*/

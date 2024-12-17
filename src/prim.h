@@ -1,0 +1,19 @@
+#ifndef PRIM_H
+#define PRIM_H
+
+typedef enum _prim_type_t
+{
+	PRIM_TYPE_NONE,
+	PRIM_TYPE_I8,
+	PRIM_TYPE_I16,
+	PRIM_TYPE_I32,
+	PRIM_TYPE_I64,
+	PRIM_TYPE_U8,
+	PRIM_TYPE_U16,
+	PRIM_TYPE_U32,
+	PRIM_TYPE_U64,
+	PRIM_TYPE_R32,
+	PRIM_TYPE_R64
+} prim_type_t;
+
+#endif // PRIM_H

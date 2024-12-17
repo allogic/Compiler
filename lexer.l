@@ -1,6 +1,6 @@
 %option yylineno
 
-%x COMMENT
+%x MULTI_LINE_COMMENT
 
 %{
 #include "parser.tab.h"
@@ -81,6 +81,12 @@ REAL_SUFFIX             "r"(32|64)
 	return PRIM_TYPE_R64;
 }
 
+"," {
+	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
+
+	return COMMA;
+}
+
 "=" {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
@@ -136,22 +142,22 @@ REAL_SUFFIX             "r"(32|64)
 "/*" {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	BEGIN(COMMENT);
+	BEGIN(MULTI_LINE_COMMENT);
 }
 
-<COMMENT>"\r" {
+<MULTI_LINE_COMMENT>"\r" {
 	UPDATE_CURSOR_LOCATION_CARRIAGE_RETURN();
 }
 
-<COMMENT>"\n" {
+<MULTI_LINE_COMMENT>"\n" {
 	UPDATE_CURSOR_LOCATION_NEW_LINE();
 }
 
-<COMMENT>. {
+<MULTI_LINE_COMMENT>. {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 }
 
-<COMMENT>"*/" {
+<MULTI_LINE_COMMENT>"*/" {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 	
 	BEGIN(INITIAL);
@@ -160,150 +166,71 @@ REAL_SUFFIX             "r"(32|64)
 [a-zA-Z_][a-zA-Z0-9_]* {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	yylval.string = yytext;
+	yylval.string = string_from(yytext);
 
-	return IDENTIFIER;
+	return IDENT;
 }
 
 "\""[^"]*"\"" {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	yylval.string = yytext;
+	yylval.string = string_from(yytext);
 
-	return STRING_LITERAL;
+	return STR_LIT;
 }
 
 {SIGN}?{DEC_DIGITS}{SIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_signed_integer(0, 10);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_I8: return I8_LITERAL;
-		case PRIMITIVE_TYPE_I16: return I16_LITERAL;
-		case PRIMITIVE_TYPE_I32: return I32_LITERAL;
-		case PRIMITIVE_TYPE_I64: return I64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_signed_integer(0, 10);
 }
 
 {DEC_DIGITS}{UNSIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_unsigned_integer(0, 10);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_U8: return U8_LITERAL;
-		case PRIMITIVE_TYPE_U16: return U16_LITERAL;
-		case PRIMITIVE_TYPE_U32: return U32_LITERAL;
-		case PRIMITIVE_TYPE_U64: return U64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_unsigned_integer(0, 10);
 }
 
 {SIGN}?{HEX_PREFIX}{HEX_DIGITS}{SIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_signed_integer(2, 16);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_I8: return I8_LITERAL;
-		case PRIMITIVE_TYPE_I16: return I16_LITERAL;
-		case PRIMITIVE_TYPE_I32: return I32_LITERAL;
-		case PRIMITIVE_TYPE_I64: return I64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_signed_integer(2, 16);
 }
 
 {HEX_PREFIX}{HEX_DIGITS}{UNSIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_unsigned_integer(2, 16);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_U8: return U8_LITERAL;
-		case PRIMITIVE_TYPE_U16: return U16_LITERAL;
-		case PRIMITIVE_TYPE_U32: return U32_LITERAL;
-		case PRIMITIVE_TYPE_U64: return U64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_unsigned_integer(2, 16);
 }
 
 {SIGN}?{OCT_PREFIX}{OCT_DIGITS}{SIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_signed_integer(2, 8);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_I8: return I8_LITERAL;
-		case PRIMITIVE_TYPE_I16: return I16_LITERAL;
-		case PRIMITIVE_TYPE_I32: return I32_LITERAL;
-		case PRIMITIVE_TYPE_I64: return I64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_signed_integer(2, 8);
 }
 
 {OCT_PREFIX}{OCT_DIGITS}{UNSIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_unsigned_integer(2, 8);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_U8: return U8_LITERAL;
-		case PRIMITIVE_TYPE_U16: return U16_LITERAL;
-		case PRIMITIVE_TYPE_U32: return U32_LITERAL;
-		case PRIMITIVE_TYPE_U64: return U64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_unsigned_integer(2, 8);
 }
 
 {SIGN}?{BIN_PREFIX}{BIN_DIGITS}{SIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_signed_integer(2, 2);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_I8: return I8_LITERAL;
-		case PRIMITIVE_TYPE_I16: return I16_LITERAL;
-		case PRIMITIVE_TYPE_I32: return I32_LITERAL;
-		case PRIMITIVE_TYPE_I64: return I64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_signed_integer(2, 2);
 }
 
 {BIN_PREFIX}{BIN_DIGITS}{UNSIGNED_INTEGER_SUFFIX}? {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_unsigned_integer(2, 2);
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_U8: return U8_LITERAL;
-		case PRIMITIVE_TYPE_U16: return U16_LITERAL;
-		case PRIMITIVE_TYPE_U32: return U32_LITERAL;
-		case PRIMITIVE_TYPE_U64: return U64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_unsigned_integer(2, 2);
 }
 
 {SIGN}?{DEC_DIGITS}({DECIMAL_POINT}{DEC_DIGITS})?({EXPONENT}{SIGN}?{DEC_DIGITS})?{REAL_SUFFIX} {
 	UPDATE_CURSOR_LOCATION_SINGLE_LINE();
 
-	primitive_type_t type = parse_real();
-
-	switch (type)
-	{
-		case PRIMITIVE_TYPE_R32: return R32_LITERAL;
-		case PRIMITIVE_TYPE_R64: return R64_LITERAL;
-		default: return INVALID_LITERAL;
-	}
+	return lit_parse_real();
 }
 
 . {
